@@ -97,7 +97,7 @@ def generate_diff(payload: Dict[str, str]):
 
 
 
-if __name__ == "__main__":
-    #print(generate_diff("Also it might be great if the script detects which OS or shell I'm using and try to use the appropriate command e.g. dir instead of ls because I don't want to be adding windows after every prompt.", "https://github.com/jayhack/llm.sh"))
-    import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+# if __name__ == "__main__":
+#     #print(generate_diff("Also it might be great if the script detects which OS or shell I'm using and try to use the appropriate command e.g. dir instead of ls because I don't want to be adding windows after every prompt.", "https://github.com/jayhack/llm.sh"))
+#     import uvicorn
+#     uvicorn.run(app, host="0.0.0.0", port=8000)
