@@ -16,7 +16,7 @@ openai.api_key = OPENAI_KEY
 
 app = FastAPI()
 
-def list_files(repo_url: str, path="src"):
+def list_files(repo_url: str, path="", file_extensions=[".py", ".js"]):
     """
     List all files in a GitHub repository at a specified path.
     Recursively explores subdirectories.
@@ -31,13 +31,15 @@ def list_files(repo_url: str, path="src"):
     if response.status_code == 200:
         contents = response.json()
         for item in contents:
-            if item['type'] == 'file':
-                files.append([item['git_url'], item['path']]) 
+            if item['type'] == 'file' and (not file_extensions or any(item['path'].endswith(ext) for ext in file_extensions)):
+                files.append([item['git_url'], item['path']])
             elif item['type'] == 'dir':
-                files.extend(list_files(repo_url, item['path']))
+                #files.extend(list_files(repo_url, item['path']))
+                files.extend(list_files(repo_url, item['path'], file_extensions))
     else:
         print(f"Failed to list contents for {path}")
     return files
+
 
 def generate_content(repo_url):
     files = list_files(repo_url)
@@ -97,7 +99,7 @@ def generate_diff(payload: Dict[str, str]):
 
 
 
-# if __name__ == "__main__":
-#     #print(generate_diff("Also it might be great if the script detects which OS or shell I'm using and try to use the appropriate command e.g. dir instead of ls because I don't want to be adding windows after every prompt.", "https://github.com/jayhack/llm.sh"))
-#     import uvicorn
-#     uvicorn.run(app, host="0.0.0.0", port=8000)
+if __name__ == "__main__":
+    print(generate_content("https://github.com/jayhack/llm.sh"))
+    # import uvicorn
+    # uvicorn.run(app, host="0.0.0.0", port=8000)
