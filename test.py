@@ -5,8 +5,8 @@ url = "http://localhost:8000/generate-diff/"
 
 # Example payload containing repoUrl and prompt
 payload = {
-    "repoUrl": "https://github.com/jayhack/llm.sh",
-    "prompt": "Also it might be great if the script detects which OS or shell I'm using and try to use the appropriate command e.g. dir instead of ls because I don't want to be adding windows after every prompt."
+    "repoUrl": "https://github.com/saarthg/PDF-Chatbot",
+    "prompt": "Can you change the app.py file so that the title is something different"
 }
 
 # Send POST request to the FastAPI endpoint

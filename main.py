@@ -10,11 +10,18 @@ from langchain.chains import LLMChain
 from langchain.prompts import PromptTemplate
 from typing import Dict
 
+from supabase import create_client, Client
+
 load_dotenv(".env")
 OPENAI_KEY = os.getenv("OPENAI_API_KEY")
 openai.api_key = OPENAI_KEY
 
+url: str = os.getenv("SUPABASE_URL")
+key: str = os.getenv("SUPABASE_KEY")
+
 app = FastAPI()
+supabase: Client = create_client(url, key)
+
 
 def list_files(repo_url: str, path="", file_extensions=[".py", ".js"]):
     """
@@ -75,7 +82,7 @@ def generate_diff(payload: Dict[str, str]):
         By accessing the following code which has the path of each file in the src folder with its code below it: 
         {content}
         
-        """,
+        """
     )
 
     chain = LLMChain(llm=llm, prompt=prompt_template)
@@ -95,11 +102,21 @@ def generate_diff(payload: Dict[str, str]):
     reflection_chain = LLMChain(llm=llm, prompt=reflection_template)
     reflection_response = reflection_chain.run(query=query, content=content, response=response)
 
+    data, error = supabase.table('diffs').insert({"prompt": query, "repoUrl": repo_url, "original_diff": response, "reflection_diff": reflection_response}).execute()
+
+    if error:
+        print('Error inserting data:', error)
+    else:
+        print('Data inserted successfully:', data)
+        
     return {"original_diff": response, "reflection_diff": reflection_response}
 
 
 
 if __name__ == "__main__":
-    print(generate_content("https://github.com/jayhack/llm.sh"))
-    # import uvicorn
-    # uvicorn.run(app, host="0.0.0.0", port=8000)
+#     generate_diff({
+#   "prompt": "Also it might be great if the script detects which OS or shell I'm using and try to use the appropriate command e.g. dir instead of ls because I don't want to be adding windows after every prompt.",
+#   "repoUrl": "https://github.com/jayhack/llm.sh"
+#     })
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)
